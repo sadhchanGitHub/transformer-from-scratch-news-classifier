@@ -35,13 +35,14 @@ Follow these steps to set up and run the project.
 Python 3.9+
 An NVIDIA GPU is recommended for training.
 2. Installation
-First, clone the repository and navigate into the project directory:```bash
+First, clone the repository and navigate into the project directory:
+code
+Bash
 git clone https://github.com/sadhchanGitHub/transformer-from-scratch-news-classifier.git
 cd transformer-from-scratch-news-classifier
-code
-Code
 Next, create and activate a virtual environment:
-```bash
+code
+Bash
 python -m venv venv
 source venv/bin/activate  # On Windows, use `venv\Scripts\activate`
 Finally, install the project dependencies and the transformer_news package in editable mode:
@@ -49,15 +50,13 @@ code
 Bash
 pip install -r requirements.txt
 pip install -e .
-```*(Note: `pip install -e .` makes your `src/transformer_news` package importable everywhere in your environment.)*
-
-## Usage
-
-### Training the Model
-You can train the model using the `train.py` script.
-
-**To train on a small sample (for a quick test):**
-```bash
+(Note: pip install -e . makes your src/transformer_news package importable everywhere in your environment.)
+Usage
+Training the Model
+You can train the model using the train.py script.
+To train on a small sample (for a quick test):
+code
+Bash
 python train.py --use-sample --num-epochs 5 --sample-size 2000
 To train on the full AG News dataset:
 code
@@ -74,10 +73,9 @@ code
 Code
 Predicted Category: Sci/Tech
 Running Tests
-This project uses pytest for testing. To run the full test suite, navigate to the project root and run:
-code
-Bash
+This project uses pytest for testing. To run the full test suite, navigate to the project root and run:```bash
 pytest
-Acknowledgments
+code
+Code
+## Acknowledgments
 The core concepts and architectural patterns implemented here were learned from and inspired by several excellent educational resources, including Jay Alammar's "The Illustrated Transformer" and Andrej Karpathy's "Let's build GPT".
-Start typing a prompt
