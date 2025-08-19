@@ -153,5 +153,4 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## Acknowledgments
 
-*   [Ashish Vaswani et al. for the original paper, "Attention Is All You Need."](https://arxiv.org/abs/1706.03762)
-*   [The Annotated Transformer by Harvard NLP for its excellent explanation of the architecture.](http://nlp.seas.harvard.edu/2018/04/03/attention.html)
+*   The core concepts and architectural patterns implemented here were learned from and inspired by several excellent educational resources, including Jay Alammar's "The Illustrated Transformer" and Andrej Karpathy's "Let's build GPT".
