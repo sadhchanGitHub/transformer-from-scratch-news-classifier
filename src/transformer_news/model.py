@@ -4,6 +4,26 @@ import torch.nn as nn
 import math
 
 class MultiHeadAttention(nn.Module):
+    """Implements the Multi-Head Attention mechanism.
+
+    This module projects the queries, keys, and values into multiple heads,
+    applies scaled dot-product attention independently on each head, and then
+    concatenates the results, projecting them back to the original dimension.
+    This allows the model to jointly attend to information from different
+    representation subspaces at different positions.
+
+    Args:
+        d_model (int): The total dimensionality of the input and output features.
+        num_heads (int): The number of parallel attention heads. `d_model` must
+            be divisible by `num_heads`.
+
+    Attributes:
+        d_head (int): The dimensionality of each attention head.
+        W_q (nn.Linear): Linear layer for transforming the query.
+        W_k (nn.Linear): Linear layer for transforming the key.
+        W_v (nn.Linear): Linear layer for transforming the value.
+        W_o (nn.Linear): Linear layer for the final output projection.
+    """
     def __init__(self, d_model, num_heads):
         super().__init__()
         assert d_model % num_heads == 0, "d_model must be divisible by num_heads"
@@ -20,6 +40,21 @@ class MultiHeadAttention(nn.Module):
         self.W_o = nn.Linear(d_model, d_model)
     
     def forward(self, Q, K, V):
+        """Computes the forward pass for multi-head attention.
+
+        Args:
+            Q (torch.Tensor): The query tensor of shape
+                (batch_size, seq_len_q, d_model).
+            K (torch.Tensor): The key tensor of shape
+                (batch_size, seq_len_k, d_model).
+            V (torch.Tensor): The value tensor of shape
+                (batch_size, seq_len_v, d_model).
+                Note: seq_len_k and seq_len_v must be the same.
+
+        Returns:
+            torch.Tensor: The output tensor of shape
+                (batch_size, seq_len_q, d_model).
+        """
         # Linear projections
         Q_proj = self.W_q(Q)
         K_proj = self.W_k(K)
@@ -64,6 +99,21 @@ class MultiHeadAttention(nn.Module):
 
 
 class PositionWiseFeedForward(nn.Module):
+    """Implements the Position-wise Feed-Forward Network (FFN).
+
+    This module consists of two linear transformations with a ReLU activation
+    in between. It is applied to each position independently.
+
+    Args:
+        d_model (int): The input and output dimensionality.
+        d_ff (int, optional): The dimensionality of the inner-layer.
+            Defaults to 4 * d_model as suggested in the original Transformer paper.
+
+    Attributes:
+        linear1 (nn.Linear): The first linear layer.
+        relu (nn.ReLU): The ReLU activation function.
+        linear2 (nn.Linear): The second linear layer.
+    """
     def __init__(self, d_model, d_ff=None):
         super().__init__()
         if d_ff is None:
@@ -77,6 +127,25 @@ class PositionWiseFeedForward(nn.Module):
 
 
 class EncoderLayer(nn.Module):
+    """A single layer of the Transformer encoder.
+
+    This layer is composed of a multi-head self-attention sub-layer and a
+    position-wise feed-forward sub-layer. A residual connection followed by
+    layer normalization is applied to the output of each sub-layer.
+
+    Args:
+        d_model (int): The dimensionality of the input and output features.
+        num_heads (int): The number of attention heads.
+        d_ff (int, optional): The inner-layer dimensionality of the FFN.
+        dropout_prob (float): The dropout probability for regularization.
+
+    Attributes:
+        attention (MultiHeadAttention): The multi-head self-attention module.
+        ff (PositionWiseFeedForward): The position-wise feed-forward network.
+        norm1 (nn.LayerNorm): Layer normalization for the attention output.
+        norm2 (nn.LayerNorm): Layer normalization for the FFN output.
+        dropout (nn.Dropout): The dropout layer.
+    """
     def __init__(self, d_model, num_heads, d_ff=None, dropout_prob=0.1):
         super().__init__()
 
@@ -96,6 +165,16 @@ class EncoderLayer(nn.Module):
         self.dropout = nn.Dropout(dropout_prob)
 
     def forward(self, x):
+        """Computes the forward pass for the encoder layer.
+
+        Args:
+            x (torch.Tensor): The input tensor of shape
+                (batch_size, seq_len, d_model).
+
+        Returns:
+            torch.Tensor: The output tensor of shape
+                (batch_size, seq_len, d_model).
+        """
         # --- Stage 1: Self-Attention Sub-layer ---
         
         # 1a. Calculate attention
@@ -117,6 +196,19 @@ class EncoderLayer(nn.Module):
 
 
 class PositionalEncoding(nn.Module):
+    """Injects positional information into the input embeddings.
+
+    This module adds a fixed, non-learned positional encoding to the input
+    embeddings. Since the Transformer architecture contains no recurrence or
+    convolution, this is necessary to give the model information about the
+    relative or absolute position of the tokens in the sequence. The encodings
+    are sinusoidal functions of different frequencies.
+
+    Args:
+        d_model (int): The dimensionality of the embeddings.
+        max_seq_len (int): The maximum possible sequence length.
+        dropout (float): The dropout probability.
+    """
     def __init__(self, d_model, max_seq_len=5000, dropout=0.1):
         super(PositionalEncoding, self).__init__()
         self.dropout = nn.Dropout(dropout)
@@ -133,8 +225,15 @@ class PositionalEncoding(nn.Module):
         self.register_buffer('pe', pe)
 
     def forward(self, x):
-        """
-        x: (batch_size, seq_len, d_model)
+        """Adds positional encoding to the input tensor.
+
+        Args:
+            x (torch.Tensor): The input tensor of token embeddings, with shape
+                (batch_size, seq_len, d_model).
+
+        Returns:
+            torch.Tensor: The input tensor with positional information added,
+                of the same shape (batch_size, seq_len, d_model).
         """
         seq_len = x.size(1)
         x = x + self.pe[:, :seq_len, :]
@@ -142,6 +241,28 @@ class PositionalEncoding(nn.Module):
 
 
 class TransformerClassifier(nn.Module):
+    """A Transformer-based text classification model.
+
+    This model uses a stack of Transformer encoder layers to process input
+    token sequences. The final representation of the sequence is obtained by
+    mean-pooling the outputs of the last encoder layer, which is then fed into
+    a linear classifier.
+
+    Args:
+        vocab_size (int): The size of the vocabulary.
+        d_model (int): The dimensionality of the embeddings and the model.
+        num_heads (int): The number of attention heads in each encoder layer.
+        num_layers (int): The number of encoder layers in the stack.
+        d_ff (int): The inner-layer dimensionality of the FFNs.
+        num_classes (int): The number of output classes for classification.
+        dropout_prob (float): The dropout probability used throughout the model.
+
+    Attributes:
+        embedding (nn.Embedding): The token embedding layer.
+        pos_encoder (PositionalEncoding): The positional encoding module.
+        encoder_layers (nn.ModuleList): A stack of Transformer encoder layers.
+        classifier (nn.Linear): The final linear classification head.
+    """
     def __init__(self, vocab_size, d_model, num_heads, num_layers, d_ff, num_classes, dropout_prob=0.1):
         super().__init__()
         
@@ -159,6 +280,16 @@ class TransformerClassifier(nn.Module):
         self.d_model = d_model
 
     def forward(self, x):
+        """Computes the forward pass for the classifier.
+
+        Args:
+            x (torch.Tensor): A tensor of input token IDs, with shape
+                (batch_size, seq_len).
+
+        Returns:
+            torch.Tensor: The raw, unnormalized scores (logits) for each class,
+                with shape (batch_size, num_classes).
+        """
         # 1. Embed and add positional info
         x = self.embedding(x) * math.sqrt(self.d_model) # Scaling factor from the paper
         x = self.pos_encoder(x)
