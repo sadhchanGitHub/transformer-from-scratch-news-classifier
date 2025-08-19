@@ -53,9 +53,6 @@ def exec_predict(text, model, vocab, tokenizer, device):
 # -----------------------------
 # Main entry point (as a callable function)
 # -----------------------------
-# -----------------------------
-# Main entry point (as a callable function)
-# -----------------------------
 def main(news_headline: str):
     """
     Loads the model and vocabulary, then runs prediction on a single news headline.

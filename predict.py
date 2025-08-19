@@ -2,7 +2,7 @@
 
 import argparse
 import logging
-from transformer_news import predict, config
+from transformer_news import predict_engine, config
 
 if __name__ == "__main__":
     # Logging setup remains the same
@@ -26,7 +26,7 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     # STEP 1: Call the main function and CAPTURE its return value
-    final_prediction = predict.main(news_headline=args.news_article_headline)
+    final_prediction = predict_engine.main(news_headline=args.news_article_headline)
 
     # STEP 2: PRINT the final result to the console for the test to see
     # This also makes the script more user-friendly for command-line use.

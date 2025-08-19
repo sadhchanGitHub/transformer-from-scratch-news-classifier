@@ -17,7 +17,7 @@ The repository includes scripts for training the model, running inference on new
 ## Features
 - **Transformer Architecture:** A from-scratch implementation of a Transformer encoder for classification.
 - **Packaged Code:** All logic is contained within the installable `transformer_news` package in the `src/` directory.
-- **Clear Entry Points:** Separate, user-friendly scripts (`run_train.py`, `run_prediction.py`) for training and inference.
+- **Clear Entry Points:** Separate, user-friendly scripts (`train.py`, `predict.py`) for training and inference.
 - **Reproducible Environment:** A `requirements.txt` file ensures a consistent setup.
 - **Unit & Integration Tests:** A `tests/` directory with `pytest` tests to validate model functionality and the prediction pipeline.
 - **Experiment-Friendly:** Easily switch between using a full dataset or a smaller sample for quick training runs.
@@ -32,8 +32,8 @@ The repository includes scripts for training the model, running inference on new
 ├── pyproject.toml         # Modern Python project configuration
 ├── README.md              # You are here!
 ├── requirements.txt       # Project dependencies
-├── run_prediction.py      # Entry-point script for inference
-└── run_train.py           # Entry-point script for training
+├── predict.py      # Entry-point script for inference
+└── train.py           # Entry-point script for training
 ```
 
 ## Quick Start
@@ -67,24 +67,24 @@ pip install -e .
 ## Usage
 
 ### Training the Model
-You can train the model using the `run_train.py` script.
+You can train the model using the `train.py` script.
 
 **To train on a small sample (for a quick test):**
 ```bash
-python run_train.py --use-sample --num-epochs 5 --sample-size 2000
+python train.py --use-sample --num-epochs 5 --sample-size 2000
 ```
 
 **To train on the full AG News dataset:**
 ```bash
-python run_train.py --num-epochs 10
+python train.py --num-epochs 10
 ```
 The best performing model will be saved to `models/transformer_news_classifier_best.pth`.
 
 ### Running Inference
-Once a model is trained, you can classify new headlines using `run_prediction.py`.
+Once a model is trained, you can classify new headlines using `predict.py`.
 
 ```bash
-python run_prediction.py --news_article_headline "NASA discovers new planet in a distant galaxy"```
+python predict.py --news_article_headline "NASA discovers new planet in a distant galaxy"```
 **Output:**
 ```
 Predicted Category: Sci/Tech

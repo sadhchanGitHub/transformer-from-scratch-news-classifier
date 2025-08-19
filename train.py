@@ -1,7 +1,7 @@
 # /run_train.py
 import argparse
 import logging
-from transformer_news import train, config
+from transformer_news import training_engine, config
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(message)s")
 
@@ -29,7 +29,7 @@ if __name__ == "__main__":
     # ... rest of the logging ...
 
     # Call the main function
-    train.main(
+    training_engine.main(
         full_dataset=full_dataset, 
         num_epochs=args.num_epochs,
         sample_size=args.sample_size
