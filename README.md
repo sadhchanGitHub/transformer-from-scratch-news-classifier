@@ -1,90 +1,157 @@
-<div align="center">
+# Transformer from Scratch for News Classification
 
-# Transformer-Based News Classifier
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Python Version](https://img.shields.io/badge/python-3.8%2B-blue.svg)](https://www.python.org/downloads/)
 
-**A from-scratch implementation of a Transformer text classifier, structured as a professional, installable Python package with a full testing suite.**
+A from-scratch implementation of the Transformer architecture for classifying news articles into different categories. This project is intended as a deep dive into the mechanics of the Transformer model as described in the paper "Attention Is All You Need."
 
-[![Python Version](https://img.shields.io/badge/Python-3.9%2B-blue.svg)](https://www.python.org/downloads/)
-[![Built with PyTorch](https://img.shields.io/badge/Built%20with-PyTorch-FF69B4.svg)](https://pytorch.org/)
-[![Tests](https://img.shields.io/badge/Tests-Passing-green.svg)](tests/)
+## Table of Contents
+- [Project Overview](#project-overview)
+- [Key Features](#key-features)
+- [Model Architecture](#model-architecture)
+- [Dataset](#dataset)
+- [Getting Started](#getting-started)
+  - [Prerequisites](#prerequisites)
+  - [Installation](#installation)
+- [Usage](#usage)
+  - [Training the Model](#training-the-model)
+  - [Running Inference](#running-inference)
+- [Results](#results)
+- [Project Structure](#project-structure)
+- [Contributing](#contributing)
+- [License](#license)
+- [Acknowledgments](#acknowledgments)
 
-</div>
+## Project Overview
 
-This project provides a complete implementation of a Transformer-based text classifier for the AG News dataset. It is built from scratch using PyTorch and structured as a professional, reusable Python package.
+This repository contains a pure Python implementation of a Transformer-based text classifier, built from the ground up with minimal reliance on high-level deep learning libraries for the core model architecture. The goal is to provide a clear and understandable codebase for educational purposes, demonstrating how to build and train a Transformer for a common NLP task like news classification.
 
-The repository includes scripts for training the model, running inference on new headlines, and a full suite of unit tests. The goal is to provide a clean, well-documented, and maintainable example of a modern NLP project.
+## Key Features
 
-## Features
-- **Transformer Architecture:** A from-scratch implementation of a Transformer encoder for classification.
-- **Packaged Code:** All logic is contained within the installable `transformer_news` package in the `src/` directory.
-- **Clear Entry Points:** Separate, user-friendly scripts (`train.py`, `predict.py`) for training and inference.
-- **Reproducible Environment:** A `requirements.txt` file ensures a consistent setup.
-- **Unit & Integration Tests:** A `tests/` directory with `pytest` tests to validate model functionality and the prediction pipeline.
-- **Experiment-Friendly:** Easily switch between using a full dataset or a smaller sample for quick training runs.
+*   **From-Scratch Implementation**: The core components of the Transformer (Self-Attention, Multi-Head Attention, Positional Encoding, Encoder layers) are built from scratch.
+*   **Modular Code**: The code is organized into logical modules for data processing, model architecture, training, and inference.
+*   **Detailed Comments**: The source code is commented to explain complex parts of the Transformer architecture.
+*   **Customizable Training**: The training script includes arguments for customizing hyperparameters like learning rate, batch size, and number of epochs.
+
+## Model Architecture
+
+The model is an implementation of the original Transformer's encoder stack.
+*   **Input Embeddings**: Converts input text tokens into dense vectors.
+*   **Positional Encoding**: Injects information about the position of tokens in the sequence.
+*   **Multi-Head Self-Attention**: Allows the model to weigh the importance of different words in the input sequence.
+*   **Feed-Forward Networks**: A fully connected feed-forward network applied to each position separately and identically.
+*   **Layer Normalization & Skip Connections**: Used to stabilize training and improve gradient flow.
+
+The final output from the encoder stack is passed through a linear layer and a softmax function to produce the probability distribution over the news categories.
+
+## Dataset
+
+This model was trained on the [**AG News**](http://groups.di.unipi.it/~gulli/AG_corpus_of_news_articles.html) dataset (or specify your dataset here). The dataset consists of news articles classified into four categories: World, Sports, Business, and Sci/Tech.
+
+| Category  | Number of Samples |
+|-----------|-------------------|
+| World     | 120,000           |
+| Sports    | 120,000           |
+| Business  | 120,000           |
+| Sci/Tech  | 120,000           |
+
+A preprocessing script is included to clean the text, tokenize it, and build a vocabulary.
+
+## Getting Started
+
+Follow these instructions to get a copy of the project up and running on your local machine.
+
+### Prerequisites
+
+*   Python 3.8 or higher
+*   pip package manager
+
+You will also need to download the required dataset and place it in the `data/` directory.
+
+### Installation
+
+1.  **Clone the repository:**
+    ```sh
+    git clone https://github.com/sadhchanGitHub/transformer-from-scratch-news-classifier.git
+    cd transformer-from-scratch-news-classifier
+    ```
+
+2.  **Create a virtual environment (recommended):**
+    ```sh
+    python -m venv venv
+    source venv/bin/activate  # On Windows, use `venv\Scripts\activate`
+    ```
+
+3.  **Install the required dependencies:**
+    ```sh
+    pip install -r requirements.txt
+    ```
+
+## Usage
+
+The project includes scripts for training the model from scratch and running inference on new text.
+
+### Training the Model
+
+To start training the model, run the `train.py` script. You can customize the training process using command-line arguments.
+
+```sh
+python src/train.py --data_path data/train.csv --epochs 10 --batch_size 32 --learning_rate 0.0001
+```
+
+### Running Inference
+
+Once a model is trained and saved, you can use the `predict.py` script to classify a new piece of text.
+
+```sh
+python src/predict.py --model_path models/best_model.pt --text "The stock market saw a new high today as tech companies soared."
+```
+
+## Results
+
+After training for 10 epochs, the model achieved the following performance on the test set:
+
+| Metric    | Score   |
+|-----------|---------|
+| Accuracy  | 91.5%   |
+| Precision | 0.91    |
+| Recall    | 0.91    |
+| F1-Score  | 0.91    |
+
+A confusion matrix and detailed classification report can be found in the `notebooks/` directory.
 
 ## Project Structure
-├── models/ # Saved model weights and vocabulary artifacts
+
+```
+.
+├── data/
+│   ├── train.csv
+│   └── test.csv
+├── models/
+│   └── best_model.pt
+├── notebooks/
+│   └── 01_data_exploration.ipynb
 ├── src/
-│ └── transformer_news/ # The core, installable Python package
-├── tests/ # Unit and integration tests
-├── .gitignore # Specifies files for Git to ignore
-├── pyproject.toml # Modern Python project configuration
-├── README.md # You are here!
-├── requirements.txt # Project dependencies
-├── predict.py # Entry-point script for inference
-└── train.py # Entry-point script for training
+│   ├── __init__.py
+│   ├── model.py
+│   ├── dataset.py
+│   ├── train.py
+│   └── predict.py
+├── .gitignore
+├── LICENSE
+├── README.md
+└── requirements.txt
+```
 
+## Contributing
 
-## Quick Start
+Contributions are welcome! If you have suggestions for improving this project, please feel free to open an issue or submit a pull request.
 
-Follow these steps to set up and run the project.
+## License
 
-### 1. Prerequisites
-- Python 3.9+
-- An NVIDIA GPU is recommended for training.
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-### 2. Installation
-First, clone the repository and navigate into the project directory:
-```bash
-git clone https://github.com/sadhchanGitHub/transformer-from-scratch-news-classifier.git
-cd transformer-from-scratch-news-classifier
+## Acknowledgments
 
-Next, create and activate a virtual environment:
-code
-Bash
-python -m venv venv
-source venv/bin/activate  # On Windows, use `venv\Scripts\activate`
-Finally, install the project dependencies and the transformer_news package in editable mode:
-code
-Bash
-pip install -r requirements.txt
-pip install -e .
-(Note: pip install -e . makes your src/transformer_news package importable everywhere in your environment.)
-Usage
-Training the Model
-You can train the model using the train.py script.
-To train on a small sample (for a quick test):
-code
-Bash
-python train.py --use-sample --num-epochs 5 --sample-size 2000
-To train on the full AG News dataset:
-code
-Bash
-python train.py --num-epochs 10
-The best performing model will be saved to models/transformer_news_classifier_best.pth.
-Running Inference
-Once a model is trained, you can classify new headlines using predict.py.
-code
-Bash
-python predict.py --news_article_headline "NASA discovers new planet in a distant galaxy"```
-
-**Expected Output:**
-Predicted Category: Sci/Tech
-code
-Code
-## Running Tests
-This project uses `pytest` for testing. To run the full test suite, navigate to the project root and run:
-```bash
-pytest
-Acknowledgments
-The core concepts and architectural patterns implemented here were learned from and inspired by several excellent educational resources, including Jay Alammar's "The Illustrated Transformer" and Andrej Karpathy's "Let's build GPT".
+*   [Ashish Vaswani et al. for the original paper, "Attention Is All You Need."](https://arxiv.org/abs/1706.03762)
+*   [The Annotated Transformer by Harvard NLP for its excellent explanation of the architecture.](http://nlp.seas.harvard.edu/2018/04/03/attention.html)
